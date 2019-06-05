@@ -38,7 +38,7 @@ class Test1and1ApacheImage(Test1and1Common):
             "Loading php config",
             "Loading plugin /opt/configurability/goplugins/php.so"
         ]
-        container_logs = self.container.logs().decode('utf-8')
+        container_logs = self.logs()
         for expected_log_line in expected_log_lines:
             self.assertTrue(
                 container_logs.find(expected_log_line) > -1,
