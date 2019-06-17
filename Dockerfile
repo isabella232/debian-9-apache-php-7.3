@@ -1,9 +1,9 @@
-FROM golang as configurability_php
+FROM golang as configurability
 MAINTAINER brian.wilkinson@1and1.co.uk
 WORKDIR /go/src/github.com/1and1internet/configurability
 RUN git clone https://github.com/1and1internet/configurability.git . \
-	&& make php\
-	&& echo "configurability php plugin successfully built"
+	&& make main apache2 php \
+	&& echo "configurability successfully built"
 
 FROM alpine as ioncube_loader
 RUN apk add git \
@@ -12,11 +12,12 @@ RUN apk add git \
 
 
 FROM 1and1internet/debian-9-apache
-MAINTAINER jessica.smith@1and1.co.uk
+MAINTAINER brian.wilkinson@1and1.co.uk
 ARG DEBIAN_FRONTEND=noninteractive
 ARG PHPVER=7.3
 COPY files /
-COPY --from=configurability_php /go/src/github.com/1and1internet/configurability/bin/plugins/php.so /opt/configurability/goplugins
+COPY --from=configurability /go/src/github.com/1and1internet/configurability/bin/configurator /usr/bin/configurator
+COPY --from=configurability /go/src/github.com/1and1internet/configurability/bin/plugins/* /opt/configurability/goplugins/
 RUN \
     apt-get update && \
     apt-get install -y imagemagick graphicsmagick curl && \
